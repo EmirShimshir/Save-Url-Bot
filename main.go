@@ -1,4 +1,4 @@
-package Save_Url_Bot
+package main
 
 import (
 	"flag"
