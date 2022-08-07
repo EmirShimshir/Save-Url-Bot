@@ -61,7 +61,7 @@ func (p *Processor) Process(event events.Event) error {
 }
 
 func (p *Processor) processMessage(event events.Event) (err error) {
-	defer func() { err = e.Wrap("can't process message", err) }()
+	defer func() { err = e.WrapIfErr("can't process message", err) }()
 	meta, err := meta(event)
 	if err != nil {
 		return err
