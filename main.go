@@ -1,22 +1,35 @@
 package Save_Url_Bot
 
 import (
-	"Save_Url_Bot/client/telegram"
 	"flag"
 	"log"
+
+	tgClient "Save_Url_Bot/client/telegram"
+	event_consumer "Save_Url_Bot/consumer/event-consumer"
+	"Save_Url_Bot/events/telegram"
+	"Save_Url_Bot/storage/files"
 )
 
 const (
-	tgBotHost = "api.telegram.org"
+	tgBotHost   = "api.telegram.org"
+	storagePath = "storage"
+	batchSize   = 100
 )
 
 func main() {
-	tgClient := telegram.New(tgBotHost, mustToken())
 
-	// fetcher = fetcher.New(tgClient)
+	eventsProcessor := telegram.New(
+		tgClient.New(tgBotHost, mustToken()),
+		files.New(storagePath),
+	)
 
-	// processor = processor.New(tgClient)
-	// consumer.Start(fetcher, processor)
+	log.Print("service started")
+
+	consumer := event_consumer.New(eventsProcessor, eventsProcessor, batchSize)
+
+	if err := consumer.Start(); err != nil {
+		log.Fatal("service is stopped", err)
+	}
 }
 
 func mustToken() string {
