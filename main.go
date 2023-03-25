@@ -1,13 +1,14 @@
 package main
 
 import (
-	"flag"
 	"log"
 
 	tgClient "Save_Url_Bot/client/telegram"
 	event_consumer "Save_Url_Bot/consumer/event-consumer"
 	"Save_Url_Bot/events/telegram"
 	"Save_Url_Bot/storage/files"
+
+	"github.com/kelseyhightower/envconfig"
 )
 
 const (
@@ -15,6 +16,10 @@ const (
 	storagePath = "storage/files"
 	batchSize   = 100
 )
+
+type Config struct {
+	Token string
+}
 
 func main() {
 
@@ -33,17 +38,11 @@ func main() {
 }
 
 func mustToken() string {
-	token := flag.String(
-		"tg-bot-token",
-		"",
-		"token for access to telegram bot",
-	)
+	var cfg Config
 
-	flag.Parse()
-
-	if *token == "" {
+	if err := envconfig.Process("tg", &cfg); err != nil {
 		log.Fatal("token is not specified")
 	}
 
-	return *token
+	return cfg.Token
 }
